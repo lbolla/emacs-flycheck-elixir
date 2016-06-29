@@ -48,7 +48,7 @@
   "Elixir checker."
   :command ("elixirc"
             "--ignore-module-conflict"  ; Avoid module conflict warnings
-            source-original)
+            source-inplace)  ; Check as soon as possible, not just on file-save
   :error-patterns
   ((warning line-start
             (file-name)
