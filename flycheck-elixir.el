@@ -65,11 +65,12 @@
             source-inplace)  ; Check as soon as possible, not just on file-save
   :error-patterns
   ((warning line-start
+            "warning: "
+            (message)
+            (one-or-more not-wordchar)
             (file-name)
             ":"
             line
-            ": warning: "
-            (message)
             line-end)
    (error line-start
           "** ("
