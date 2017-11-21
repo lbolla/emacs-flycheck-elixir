@@ -56,7 +56,7 @@
                 (seq-reduce (lambda (a p) (cons "-pa" (cons (concat p "/ebin") a))) dep-paths ()))
               )))))
 
-(flycheck-define-checker elixir-project
+(flycheck-define-checker elixir
   "Elixir checker."
   :command ("elixirc"
             "--ignore-module-conflict"  ; Avoid module conflict warnings
@@ -85,7 +85,7 @@
   :predicate
     (lambda () (not (string-equal "exs" (file-name-extension buffer-file-name)))))
 
-(add-to-list 'flycheck-checkers 'elixir-project t)
+(add-to-list 'flycheck-checkers 'elixir t)
 
-(provide 'flycheck-elixir-project)
+(provide 'flycheck-elixir)
 ;;; flycheck-elixir.el ends here
