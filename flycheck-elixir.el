@@ -44,10 +44,24 @@
 (require 'flycheck)
 
 
-(flycheck-define-checker elixir
+(defun elixirc-params (filename)
+  (let ((project-path (locate-dominating-file filename "mix.exs")))
+    (if project-path
+        (let ((lib-path (concat project-path "_build/dev/lib")))
+          (if (file-directory-p lib-path)
+              (let ((dep-paths (remove-if (lambda (p)
+                                            (let ((n (file-name-base p)))
+                                              (or (equal n ".") (equal n ".."))))
+                                          (directory-files lib-path t))))
+                (seq-reduce (lambda (a p) (cons "-pa" (cons (concat p "/ebin") a))) dep-paths ()))
+              )))))
+
+(flycheck-define-checker elixir-project
   "Elixir checker."
   :command ("elixirc"
             "--ignore-module-conflict"  ; Avoid module conflict warnings
+            (eval (list "-o" (flycheck-temp-dir-system)))
+            (eval (elixirc-params (buffer-file-name)))
             source-inplace)  ; Check as soon as possible, not just on file-save
   :error-patterns
   ((warning line-start
@@ -67,9 +81,11 @@
           ": "
           (message)
           line-end))
-  :modes elixir-mode)
+  :modes elixir-mode
+  :predicate
+    (lambda () (not (string-equal "exs" (file-name-extension buffer-file-name)))))
 
-(add-to-list 'flycheck-checkers 'elixir t)
+(add-to-list 'flycheck-checkers 'elixir-project t)
 
-(provide 'flycheck-elixir)
+(provide 'flycheck-elixir-project)
 ;;; flycheck-elixir.el ends here
