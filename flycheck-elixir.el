@@ -41,11 +41,22 @@
 ;; Boston, MA 02110-1301, USA.
 
 ;;; Code:
+(require 'cl)
 (require 'flycheck)
 
+(defun find-project-root (filename)
+  (let ((closest-mix-root (locate-dominating-file filename "mix.exs")))
+    (let ((apps-match (string-match "/apps/[^/]+" closest-mix-root)))
+      (if apps-match
+          (let ((project-root (substring closest-mix-root 0 (+ 1 apps-match))))
+            (if (file-exists-p (concat project-root "mix.exs"))
+                project-root
+              closest-mix-root))
+        closest-mix-root))
+    ))
 
 (defun elixirc-params (filename)
-  (let ((project-path (locate-dominating-file filename "mix.exs")))
+  (let ((project-path (find-project-root filename)))
     (if project-path
         (let ((lib-path (concat project-path "_build/dev/lib")))
           (if (file-directory-p lib-path)
